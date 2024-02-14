@@ -51,12 +51,12 @@ const productSchema = new mongoose.Schema(
     subcategories: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "SubCategories",
+        ref: "subcategories",
       },
     ],
     brand: {
       type: mongoose.Schema.ObjectId,
-      ref: "Brand",
+      ref: "brand",
     },
     ratingsAverage: {
       type: Number,

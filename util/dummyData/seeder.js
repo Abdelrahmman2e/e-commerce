@@ -1,27 +1,21 @@
-const fs = require('fs');
-require('colors');
-const dotenv = require('dotenv');
-const Product = require('../../models/productModel');
-const dbConnection = require('../../config/database');
+const fs = require("fs");
+const Product = require("../../models/porductModel");
+require("colors");
+require("dotenv").config({ path: "../../config.env" });
+const dbConnection = require("../../config/database");
+const products = JSON.parse(fs.readFileSync("../dummyData/products.json"));
 
-dotenv.config({ path: '../../config.env' });
-
-// connect to DB
+//db connection
 dbConnection();
 
-// Read data
-const products = JSON.parse(fs.readFileSync('./products.json'));
-
-
-// Insert data into DB
+//insert data on db
 const insertData = async () => {
   try {
     await Product.create(products);
-
-    console.log('Data Inserted'.green.inverse);
+    console.log("Data Inserted".green.inverse);
     process.exit();
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -29,16 +23,16 @@ const insertData = async () => {
 const destroyData = async () => {
   try {
     await Product.deleteMany();
-    console.log('Data Destroyed'.red.inverse);
+    console.log("Data Destroyed".red.inverse);
     process.exit();
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
   }
 };
 
-// node seeder.js -d
-if (process.argv[2] === '-i') {
+// node seeder.js -i
+if (process.argv[2] == "-i") {
   insertData();
-} else if (process.argv[2] === '-d') {
+} else if (process.argv[2] == "-d") {
   destroyData();
 }

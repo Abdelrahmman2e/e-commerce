@@ -2,6 +2,8 @@ const Brand = require("../models/brandModel");
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../util/ApiErrors");
+const ApiFeatures = require("../util/ApiFeatures");
+const Factory=require("./handlersFactory")
 
 //  @desc     Create new Brand
 //  @route    POST  /api/brands
@@ -18,13 +20,19 @@ let createBrand = asyncHandler(async (req, res, nxt) => {
 });
 
 let getAllBrands = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
+  const docsCount = await Brand.countDocuments();
+  const ApiFeature = new ApiFeatures(Brand.find(), req.query)
+    .paginate(docsCount)
+    .sort()
+    .search()
+    .fieldsLimit()
+    .filter();
 
-  const brands = await Brand.find({}).limit(limit).skip(skip).exec();
-
-  res.status(200).json({ results: brands.length, page, data: brands });
+  const { mongooseQuery, ResultPagination } = ApiFeature;
+  const brands = await mongooseQuery;
+  res
+    .status(200)
+    .json({ results: brands.length, ResultPagination, data: brands });
 });
 
 let getBrandById = asyncHandler(async (req, res, nxt) => {
@@ -37,31 +45,9 @@ let getBrandById = asyncHandler(async (req, res, nxt) => {
   res.status(200).json({ data: brand });
 });
 
-let updateBrand = asyncHandler(async (req, res, nxt) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const brand = await Brand.findByIdAndUpdate(
-    id,
-    {
-      name,
-      slug: slugify(name),
-    },
-    { new: true }
-  );
-  if (!brand) {
-    return nxt(new ApiError(`No Brand for this Id: ${id}`, 404));
-  }
-  res.status(200).json({ data: brand });
-});
+let updateBrand =Factory.updateOne(Brand)
 
-let deleteBrand = asyncHandler(async (req, res, nxt) => {
-  const { id } = req.params;
-  const brand = await Brand.findByIdAndDelete(id);
-  if (!brand) {
-    return nxt(new ApiError(`No Brand for this Id: ${id}`, 404));
-  }
-  res.status(204).end();
-});
+let deleteBrand =Factory.deleteOne(Brand)
 
 module.exports = {
   createBrand,
