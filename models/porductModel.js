@@ -71,4 +71,10 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+productSchema.pre("find", function (nxt) {
+  this.populate({ path: "category", select: "name -_id" });
+  // .populate({ path: "subcategories", select: "name -_id" });
+  nxt();
+});
+
 module.exports = mongoose.model("product", productSchema);

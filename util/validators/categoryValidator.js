@@ -1,5 +1,6 @@
 const { check } = require("express-validator");
 const validatorMW = require("../../middlewares/validatorMW");
+const slugify=require("slugify");
 let getCategoryValidator = [
   check("id").isMongoId().withMessage("Invalid Category Id..!!"),
   validatorMW,
@@ -12,7 +13,7 @@ let createNewCategValidator = [
     .isLength({ min: 4 })
     .withMessage("Too Short Category Name")
     .isLength({ max: 30 })
-    .withMessage("Too Long Category Name"),
+    .withMessage("Too Long Category Name").custom((val,{req})=>req.body.slug=slugify(val)),
   validatorMW,
 ];
 
@@ -28,7 +29,7 @@ let updateCategValidator = [
     .isLength({ min: 4 })
     .withMessage("Too Short Category Name")
     .isLength({ max: 30 })
-    .withMessage("Too Long Category Name"),
+    .withMessage("Too Long Category Name").custom((val,{req})=>req.body.slug=slugify(val)),
   validatorMW,
 ];
 

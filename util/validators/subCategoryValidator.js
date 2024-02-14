@@ -9,7 +9,8 @@ let createSubCategValidator = [
     .isLength({ min: 2 })
     .withMessage("Too Short Subcategory name..!!")
     .isLength({ max: 32 })
-    .withMessage("Too Long Subcategory name..!!"),
+    .withMessage("Too Long Subcategory name..!!")
+    .custom((val, { req }) => (req.body.slug = slugify(val))),
   check("category")
     .notEmpty()
     .withMessage("Subcategory must be belong to Category..!!")

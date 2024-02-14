@@ -15,7 +15,10 @@ let createBrandValidator = [
     .withMessage("Too Short Brand Name")
     .isLength({ max: 30 })
     .withMessage("Too Long Brand Name")
-    ,
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
   validatorMW,
 ];
 
@@ -31,7 +34,8 @@ let updateBrandValidator = [
     .isLength({ min: 2 })
     .withMessage("Too Short Brand Name")
     .isLength({ max: 30 })
-    .withMessage("Too Long Brand Name").custom((val, { req }) => {
+    .withMessage("Too Long Brand Name")
+    .custom((val, { req }) => {
       req.body.slug = slugify(val);
       return true;
     }),

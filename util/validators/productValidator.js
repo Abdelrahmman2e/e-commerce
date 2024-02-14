@@ -10,10 +10,7 @@ let createProductValidator = [
     .withMessage("must be at least 3 chars")
     .notEmpty()
     .withMessage("Product required")
-    .custom((val, { req }) => {
-      req.body.slug = slugify(val);
-      return true;
-    }),
+    .custom((val, { req }) => (req.body.slug = slugify(val))),
   check("description")
     .notEmpty()
     .withMessage("Product description is required")
@@ -83,17 +80,19 @@ let createProductValidator = [
           return Promise.reject(new Error(`Invalid Subcategories Ids`));
         }
       })
-      )
-      .custom((val, { req }) =>
+    )
+    .custom((val, { req }) =>
       SubCategory.find({ category: req.body.category }).then(
         (subcategoriesIds) => {
           const subcategoriesIdsDB = [];
           subcategoriesIds.forEach((subcategory) => {
             subcategoriesIdsDB.push(subcategory._id.toString());
           });
-          const checker=(target,arr)=>target.every((v)=>arr.includes(v))
-          if(!checker(val,subcategoriesIdsDB)){
-            return Promise.reject(new Error(`subcategoreies not belong to category`));
+          const checker = (target, arr) => target.every((v) => arr.includes(v));
+          if (!checker(val, subcategoriesIdsDB)) {
+            return Promise.reject(
+              new Error(`subcategoreies not belong to category`)
+            );
           }
         }
       )
